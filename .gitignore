@@ -30,3 +30,5 @@
 /obj/Debug/net6.0/win-x64/PublishOutputs.3889ff5776.txt
 /.idea/.idea.custom-module-example.dir/.idea/vcs.xml
 /.idea/.idea.CustomModule/.idea/workspace.xml
+/obj
+/Module.Modified.xml
