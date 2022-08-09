@@ -1,4 +1,4 @@
-﻿/.idea/.idea.custom-module-example.dir/.idea/.gitignore
+﻿/.idea/*
 /obj/Debug/net6.0/win-x64/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
 /obj/Debug/net6.0/win-x64/CustomModule.AssemblyInfo.cs
 /obj/Debug/net6.0/win-x64/CustomModule.AssemblyInfoInputs.cache
@@ -23,13 +23,9 @@
 /CustomModule.zip
 /obj/Decisions.Web.Core.dll
 /obj/DecisionsFramework.dll
-/.idea/.idea.custom-module-example.dir/.idea/encodings.xml
-/.idea/.idea.custom-module-example.dir/.idea/indexLayout.xml
 /obj/project.assets.json
 /obj/project.nuget.cache
 /obj/Debug/net6.0/win-x64/PublishOutputs.3889ff5776.txt
-/.idea/.idea.custom-module-example.dir/.idea/vcs.xml
-/.idea/.idea.CustomModule/.idea/workspace.xml
 /obj
 /Module.Modified.xml
 /bin
