@@ -7,8 +7,8 @@
 	<ReferenceDlls/>
     <CliDlls/>
     <WebPages/>
-	<MvcViews/>
-	<MvcDlls/>
+    <MvcViews/>
+    <MvcDlls/>
     <AgentDlls/>
     <InstallScript/>
     <SqlScripts/>
