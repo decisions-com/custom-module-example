@@ -4,11 +4,11 @@
 	<CoreServicesDlls>
       <string>.\obj\Debug\net6.0\win-x64\CustomModule.dll</string>
     </CoreServicesDlls>
-	<ReferenceDlls/>
+    <ReferenceDlls/>
     <CliDlls/>
     <WebPages/>
-	<MvcViews/>
-	<MvcDlls/>
+    <MvcViews/>
+    <MvcDlls/>
     <AgentDlls/>
     <InstallScript/>
     <SqlScripts/>
