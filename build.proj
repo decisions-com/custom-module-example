@@ -4,6 +4,7 @@
     
 	<Target Name="build_all">
         <Exec Command="dotnet publish .\CustomModule.csproj --runtime win-x64 --self-contained false --output .\obj -c Debug" />
+		<Exec Command="dotnet tool uninstall --global CreateDecisionsModule-GlobalTool" />
 		<Exec Command="dotnet tool update --global CreateDecisionsModule-GlobalTool --version 1.0.9" />
         <CallTarget Targets="build_module"/>
     </Target>
