@@ -9,7 +9,7 @@
     </Target>
     
 	<Target Name="build_module">
-        <Exec Command="CreateDecisionsModule -buildmodule CustomModule -output &quot;.&quot; -buildfile Module.Build.xml"/>
+        <Exec Command="CreateDecisionsModule -buildmodule CustomModule -output &quot;.&quot; -buildfile Module.Build.json"/>
     </Target>
 
 </Project>
