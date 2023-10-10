@@ -22,7 +22,7 @@ namespace CustomModule
         public static bool IsProductLessThan(Int32 numberOne, Int32 numberTwo, Int32 numberToCompare)
         {
             Int32 product = numberOne * numberTwo;
-            return product > numberToCompare;
+            return product < numberToCompare;
         }
     }
 }
