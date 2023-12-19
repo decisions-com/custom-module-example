@@ -1,69 +1,28 @@
 #Requires -RunAsAdministrator
 
-param (
-    [Parameter(Mandatory=$false)][string]$msbuild,
-    [Parameter(Mandatory=$false)][string]$framework
+param 
+(
+    [Parameter(Mandatory=$false)]
+	[switch] $deployModuleLocally
 )
 
-function FindMSBuild {
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
+function FindModuleName($buildProj)
+{
+    [xml]$local:XmlDocument = Get-Content -Path $buildProj
+
+    foreach($local:target in $local:XmlDocument.Project.Target){
+        if($local:target.Name -eq "build_module")
+        {
+            $local:cmdline = $local:target.Exec.Command
+            break
+        }
     }
 
-    # Check for Visual Studio MSBuild version 2019 (15.0)
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
+    $local:cmdline = $local:cmdline -split ' '
+    $local:index = [array]::indexof($local:cmdline,"-buildmodule")
+    $local:index++
 
-    # Check for Visual Studio MSBuild version 2019 (15.0)
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2022\Professional\MSBuild\Current\bin\msbuild.exe"
-        if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-	
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    # Check for Visual Studio MSBuild version 2019 (15.0)
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    # Check for Visual Studio MSBuild version 2019 (15.0)
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "Microsoft Visual Studio\2019\Professional\MSBuild\Current\bin\msbuild.exe"
-        if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "\Microsoft Visual Studio\2019\Professional\MSBuild\Current\bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
-
-    $guess = Join-Path -Path ${Env:ProgramFiles(x86)} -ChildPath "\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe"
-    if (Test-Path -PathType leaf -LiteralPath $guess ) {
-        return $guess
-    }
+    return $local:cmdline[$local:index]
 }
 
 function GetCompileTarget($basePath) {
@@ -132,28 +91,26 @@ function FindSolutionFile($basePath) {
     return $local:filelist[0].FullName
 }
 
-if ($msbuild) {
-    Write-Output "Using $msbuild"
-} else {
-    Write-Output "Looking for MSBUILD.exe"
-    $msbuild = FindMSBuild
-    Write-Output "Found and Trying $msbuild"
-}
-
 $basePath = (Get-Location).Path
-Write-Output "Using basePath = $basePath"
+Write-Output "Using basePath - $basePath"
+
+$moduleName = FindModuleName("$basePath\build.proj")
+
+# Build the Module.
+Write-Output "Building $moduleName"
 
 Write-Output "Compiling Project by build.proj, or by .sln file."
-$compiletarget = GetCompileTarget $basepath
+$compileTarget = GetCompileTarget($basepath)
 
-$solution = FindSolutionFile($basePath)
-& $msbuild -t:restore $solution
-& $msbuild $compiletarget
-if ($LastExitCode -ne 0)
+Write-Output "Found Compile Target - $compileTarget"
+
+dotnet build $compileTarget
+
+# If the deployModuleLocally switch is present, do the needful
+if($deployModuleLocally.IsPresent) 
 {
-   throw "Compile failed with the return code: $LastExitCode"
+	Write-Output "Deploying $moduleName to the Local Decisions Instance"
+	StopDecisionsServer
+	CopyModule $basePath $moduleName
+	StartDecisionsServer
 }
-
-StopDecisionsServer
-CopyModule($basePath)
-StartDecisionsServer
